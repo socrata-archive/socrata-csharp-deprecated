@@ -20,14 +20,12 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Socrata
-{
-    /**
-     * Represents a Socrata user.
-     * 
-     * @author aiden.scandella@socrata.com
-     */
-    class User
-    {
+namespace Socrata {
+    /// <summary>
+    /// Represents a Socrata user
+    /// </summary>
+    public class User : ApiBase {
+
     }
+
 }

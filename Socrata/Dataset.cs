@@ -20,15 +20,15 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace Socrata
-{
-    /**
-     * A Socrata dataset and associated rows/columns/metadata
-     *
-     * @author aiden.scandella@socrata.com
-     */
-    public class Dataset
-    {
+namespace Socrata {
+    /// <summary>
+    /// A Socrata dataset and associated rows/columns/metadata
+    /// </summary>
+    public class Dataset : ApiBase {
+
+
     }
 }
