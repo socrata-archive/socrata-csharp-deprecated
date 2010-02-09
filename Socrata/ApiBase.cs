@@ -51,9 +51,16 @@ namespace Socrata {
         /// </summary>
         /// <param name="url">The URL to request from</param>
         /// <returns>The JSON response</returns>
-        protected JObject GetRequest(String url) {
+        protected JsonPayload GetRequest(String url) {
             HttpWebRequest request = (HttpWebRequest) WebRequest.Create(httpBase + url);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response;
+            try {
+                response = (HttpWebResponse)request.GetResponse();
+            }
+            catch (WebException ex) {
+                _log.Error("Could not get response from GET request.", ex);
+                return null;
+            }
 
             Stream responseStream = response.GetResponseStream();
             StringBuilder sb = new StringBuilder();
@@ -62,6 +69,7 @@ namespace Socrata {
             int count = 0;
             byte[] buffer = new byte[8192];
 
+            // Read to the end of the response
             do {
                 count = responseStream.Read(buffer, 0, buffer.Length);
 
@@ -71,8 +79,7 @@ namespace Socrata {
                 }
             } while (count > 0);
 
-            JObject jsonResponse = JObject.Parse(sb.ToString());
-            return jsonResponse;
+            return new JsonPayload(sb.ToString());
         }
 
         /// <summary>
@@ -81,7 +88,7 @@ namespace Socrata {
         /// <param name="url">Where to send the post request</param>
         /// <param name="parameters">The data to accompany the post request</param>
         /// <returns>The JSON response</returns>
-        protected JObject PostRequest(String url, String parameters) {
+        protected JsonPayload PostRequest(String url, String parameters) {
             WebRequest request = WebRequest.Create(httpBase + url);
             request.Credentials = credentials;
 
@@ -112,8 +119,7 @@ namespace Socrata {
                 }
 
                 StreamReader reader = new StreamReader(response.GetResponseStream());
-                JObject jsonResponse = JObject.Parse(reader.ReadToEnd());
-                return jsonResponse;
+                return new JsonPayload(reader.ReadToEnd());
             }
             catch (WebException ex) {
                 _log.Error("Error receiving response from server.", ex);

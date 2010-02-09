@@ -29,6 +29,10 @@ namespace Socrata {
     /// </summary>
     public class Dataset : ApiBase {
 
+        public Dataset()
+            : base() {
+            GetRequest("/users/aiden/views.json");
+        }
 
     }
 }
