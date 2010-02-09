@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="ApiBase.cs" />
     <Compile Include="Dataset.cs" />
+    <Compile Include="JsonPayload.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="User.cs" />
   </ItemGroup>
