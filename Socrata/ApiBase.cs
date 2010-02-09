@@ -53,6 +53,7 @@ namespace Socrata {
         /// <returns>The JSON response</returns>
         protected JsonPayload GetRequest(String url) {
             HttpWebRequest request = (HttpWebRequest) WebRequest.Create(httpBase + url);
+            request.Credentials = credentials;
             HttpWebResponse response;
             try {
                 response = (HttpWebResponse)request.GetResponse();
@@ -90,13 +91,15 @@ namespace Socrata {
         /// <returns>The JSON response</returns>
         protected JsonPayload PostRequest(String url, String parameters) {
             WebRequest request = WebRequest.Create(httpBase + url);
+            request.PreAuthenticate = true;
             request.Credentials = credentials;
 
-            request.ContentType = "application/x-www-form-urlencoded";
+            // request.ContentType = "application/x-www-form-urlencoded";
             request.Method = "POST";
 
             byte[] bytes = Encoding.ASCII.GetBytes(parameters);
             Stream outputStream = null;
+
             try {
                 request.ContentLength = bytes.Length;
                 outputStream = request.GetRequestStream();

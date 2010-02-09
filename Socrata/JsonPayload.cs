@@ -20,7 +20,22 @@ namespace Socrata {
         public String   Message       { get { return _message; } }
 
         public JsonPayload(String payload) {
+            
             parseString(payload);
+        }
+
+        public override String ToString() {
+            String rep = "";
+            if (_jsonObject != null) {
+                rep += "Object: " + _jsonObject.ToString() + " ";
+            }
+            if (_jsonArray != null) {
+                rep += "Array: " + _jsonArray.ToString() + " ";
+            }
+            if (_message != null) {
+                rep += "String: " + _message;
+            }
+            return rep;
         }
 
         private void parseString(String payload) {

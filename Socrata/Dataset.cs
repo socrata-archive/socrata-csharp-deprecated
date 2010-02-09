@@ -28,9 +28,28 @@ namespace Socrata {
     /// A Socrata dataset and associated rows/columns/metadata
     /// </summary>
     public class Dataset : ApiBase {
+        /// <summary>
+        /// Creates a new, blank dataset.
+        /// </summary>
+        /// <param name="name">The name of the dataset (must be unique)</param>
+        /// <param name="description">On optional description</param>
+        /// <returns></returns>
+        public bool create(String name, String description) {
+            // The data we will send via a POST request
+            JObject data = new JObject();
+            data.Add("name", name);
+            if (description != null) {
+                data.Add("description", description);
+            }
 
-        public Dataset()
-            : base() {
+            JsonPayload response = PostRequest("/views.json", data.ToString(Formatting.None, null));
+            if (response == null) {
+                _log.Error("Received null response trying to create dataset.");
+                return false;
+            }
+            // Read the UID off the response here...
+
+            return true;
         }
 
     }
