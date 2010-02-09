@@ -31,8 +31,6 @@ namespace Socrata {
 
         public Dataset()
             : base() {
-            JsonPayload response = GetRequest("/users/aiden/views.json");
-            Console.Write(response.JsonArray.ToString());
         }
 
     }
