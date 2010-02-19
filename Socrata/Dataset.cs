@@ -159,7 +159,7 @@ namespace Socrata {
             JObject rowJson = MapToJson(row);
             string rowString = rowJson.ToString(Formatting.None, null);
 
-            BatchRequest request = new BatchRequest("POST", httpBase +
+            BatchRequest request = new BatchRequest("POST",
                 "/views/" + _uid + "/rows.json",
                 rowString);
             batchQueue.Add(request);

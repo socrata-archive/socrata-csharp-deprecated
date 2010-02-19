@@ -38,6 +38,7 @@ namespace Socrata {
         protected List<BatchRequest>    batchQueue;
 
         public ApiBase() {
+            batchQueue = new List<BatchRequest>();
             _log = LogManager.GetLogger(typeof(ApiBase));
             // Sets up log4net to use a root level logger with ConsoleAppend
             BasicConfigurator.Configure();
@@ -155,6 +156,33 @@ namespace Socrata {
             catch (WebException ex) {
                 _log.Error("Error uploading file.", ex);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Processess any batch requests saved up in the queue
+        /// </summary>
+        public void sendBatchRequest() {
+            if (batchQueue.Count < 1) {
+                _log.Info("Call to sendBatchRequest ignored because batchQueue is empty");
+                return;
+            }
+            JArray batches = new JArray();
+            foreach (BatchRequest b in batchQueue) {
+                batches.Add(b.data());
+            }
+
+            JObject bodyObject = new JObject();
+            bodyObject.Add("requests", batches);
+            Console.WriteLine(bodyObject.ToString(Formatting.None, null));
+
+            JsonPayload response = genericWebReuest("/batches", bodyObject.ToString(Formatting.None, null), "POST");
+            if (responseIsClean(response)) {
+                _log.Debug("Sent batch requests: " + batchQueue.Count + " total.");
+                batchQueue.Clear();
+            }
+            else {
+                _log.Error("Error sending batch request.");
             }
         }
 
