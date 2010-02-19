@@ -38,6 +38,10 @@ namespace Socrata {
             return rep;
         }
 
+        /// <summary>
+        /// Looks at a string, converting it to a JSON Array or Object
+        /// </summary>
+        /// <param name="payload">The JSON string</param>
         private void parseString(String payload) {
             try {
                 _jsonObject = JObject.Parse(payload);

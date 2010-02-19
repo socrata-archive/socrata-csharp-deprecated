@@ -130,5 +130,25 @@ namespace Socrata {
             }
         }
 
+        /// <summary>
+        /// Checks response object to see if any errors are present
+        /// </summary>
+        /// <param name="response">The JSON response returned from the server</param>
+        /// <returns>True if no errors, false otherwise</returns>
+        protected bool responseIsClean(JsonPayload response) {
+            if (response == null) {
+                return false;
+            }
+
+            if (response.Message != null && response.Message.Length > 0) {
+                _log.Warn("Non-JSON response: " + response.Message);
+                return false;
+            }
+            else if (response.JsonObject != null && response.JsonObject["error"] != null) {
+                    _log.Error("Error in response: " + response.JsonObject["error"]);
+                    return false;
+            }
+            return true;
+        }
     }
 }

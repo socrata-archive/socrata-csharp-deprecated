@@ -22,12 +22,19 @@ using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
 
 namespace Socrata {
     /// <summary>
     /// A Socrata dataset and associated rows/columns/metadata
     /// </summary>
     public class Dataset : ApiBase {
+        private string uid;
+        private static readonly Regex   UID_PATTERN          = new Regex("[a-z0-9]{4}-[a-z0-9]{4}");
+        private static readonly int     DEFAULT_COLUMN_WIDTH = 100;
+        private static readonly string  DEFAULT_COLUMN_TYPE  = "text";
+
+
         /// <summary>
         /// Creates a new, blank dataset.
         /// </summary>
@@ -48,8 +55,37 @@ namespace Socrata {
                 return false;
             }
             // Read the UID off the response here...
+            if (responseIsClean(response)) {
+                if (response.JsonObject != null) {
 
-            return true;
+                    string uid = (string) response.JsonObject["id"];
+                    if (isValidId(uid)) {
+                        this.uid = uid;
+                        _log.Info("Successfully created dataset (" + uid + ")");
+                        return true;
+                    }
+                    else {
+                        _log.Error("Received invalid UID in response for dataset creation: '" + uid + "'");
+                        return false;
+                    }
+                }
+                else {
+                    _log.Error("Error creating dataset: null JSON response, no error message.");
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the given string represents a valid 4-4 Socrata UID
+        /// </summary>
+        /// <param name="id">The string to check</param>
+        /// <returns>Whether or not it matches</returns>
+        private static bool isValidId(String id) {
+            return UID_PATTERN.IsMatch(id);
         }
 
     }
