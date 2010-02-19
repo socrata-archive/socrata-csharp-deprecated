@@ -54,6 +54,7 @@ namespace Socrata {
         /// <returns>The JSON response</returns>
         protected JsonPayload GetRequest(String url) {
             HttpWebRequest request = (HttpWebRequest) WebRequest.Create(httpBase + url);
+            request.PreAuthenticate = true;
             request.Credentials = credentials;
             HttpWebResponse response;
             try {

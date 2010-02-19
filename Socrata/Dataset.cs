@@ -280,6 +280,10 @@ namespace Socrata {
             return null;
         }
 
+        /// <summary>
+        /// Gets a JSON Array of the rows in the dataset
+        /// </summary>
+        /// <returns>The rows</returns>
         public JArray rows() {
             if (!attached()) {
                 return null;
@@ -291,6 +295,11 @@ namespace Socrata {
             return null;
         }
 
+        /// <summary>
+        /// Sets the dataset's attribution, e.g. "provided by"
+        /// </summary>
+        /// <param name="attribution">Name of the data source/organization</param>
+        /// <param name="url">An optional link to the data source</param>
         public void setAttribution(String attribution, String url) {
             JObject data = new JObject();
             data.Add("attribution", attribution);
@@ -298,6 +307,10 @@ namespace Socrata {
             putRequest(data.ToString(Formatting.None, null));
         }
 
+        /// <summary>
+        /// Sets the dataset's description
+        /// </summary>
+        /// <param name="description">The description</param>
         public void setDescription(String description) {
             JObject data = new JObject();
             data.Add("description", description);
@@ -321,8 +334,6 @@ namespace Socrata {
                 _log.Error("Error in put request. See logs.");
             }
         }
-
-        // ********************** Above here
 
         private bool multipartAppendOrRefresh(String filename, String method) {
             if (!attached()) {
