@@ -133,6 +133,77 @@ namespace Socrata {
             return multipartAppendOrRefresh(filename, "append");
         }
 
+        // ********************** Work below here
+
+
+        public bool addRow(Dictionary<string,string> row) {
+
+            return false;
+        }
+
+        public void delayAddRow(Dictionary<string,string> row) {
+
+        }
+
+        public bool addColumn(String name, String description, String type, int width, bool hidden) {
+
+            return false;
+        }
+
+        public String uploadFile(String file) {
+
+            return null;
+        }
+
+        public bool delete() {
+
+            return false;
+        }
+
+        public bool setPublic(bool isPublic) {
+            string paramString = isPublic ? "public" : "private";
+            return false;
+        }
+
+        public JObject metadat() {
+
+            return null;
+        }
+
+        public JArray columns() {
+
+            return null;
+        }
+
+        public JArray rows() {
+
+            return null;
+        }
+
+        public void setAttribution(String attribution, String url) {
+
+        }
+
+        public void setDescription(String description) {
+
+        }
+
+        /// <summary>
+        /// Gets an href to the dataset, shortened.
+        /// </summary>
+        /// <returns>The URL to view the dataset at</returns>
+        public String shortUrl() {
+            return httpBase + "/d/" + _uid;
+        }
+
+        private void putRequest(String body) {
+            if (!attached()) {
+                return;
+            }
+        }
+
+        // ********************** Above here
+
         private bool multipartAppendOrRefresh(String filename, String method) {
             if (!attached()) {
                 return false;
