@@ -222,18 +222,27 @@ namespace Socrata {
             return (string)response["file"];
         }
 
+        /// <summary>
+        /// Deletes (irreversibly) the current dataset
+        /// </summary>
+        /// <returns>Success if your dataset has been vanquished</returns>
         public bool delete() {
             if (!attached()) {
                 return false;
             }
-
             return responseIsClean(genericWebReuest("/views.json/?id=" +
-                _uid + "&method=delete","","DELETE", true));
+                _uid + "&method=delete","","DELETE"));
         }
 
+        /// <summary>
+        /// Sets the dataset's visibility
+        /// </summary>
+        /// <param name="isPublic">Whether or not it should be publicly viewable</param>
+        /// <returns></returns>
         public bool setPublic(bool isPublic) {
-            string paramString = isPublic ? "public" : "private";
-            return false;
+            string paramString = isPublic ? "public.read" : "private";
+            return responseIsClean(GetRequest("/views/" + _uid + 
+                "?method=setPermission&value=" + paramString));
         }
 
         public JObject metadata() {
@@ -325,7 +334,7 @@ namespace Socrata {
         /// <param name="id">The string to check</param>
         /// <returns>Whether or not it matches</returns>
         private static bool isValidId(String id) {
-            return UID_PATTERN.IsMatch(id);
+            return id != null && UID_PATTERN.IsMatch(id);
         }
 
         /// <summary>

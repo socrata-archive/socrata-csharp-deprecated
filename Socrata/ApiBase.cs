@@ -84,7 +84,7 @@ namespace Socrata {
             return new JsonPayload(sb.ToString());
         }
 
-        protected JsonPayload genericWebReuest(String url, String parameters, String method, bool ignoreResponse) {
+        protected JsonPayload genericWebReuest(String url, String parameters, String method) {
             WebRequest request = WebRequest.Create(httpBase + url);
             request.PreAuthenticate = true;
             request.Credentials = credentials;
@@ -117,10 +117,6 @@ namespace Socrata {
                 StreamReader reader = new StreamReader(response.GetResponseStream());
                 String read = reader.ReadToEnd();
 
-                if (ignoreResponse) {
-                    return null;
-                }
-
                 return new JsonPayload(read);
             }
             catch (WebException ex) {
@@ -136,7 +132,7 @@ namespace Socrata {
         /// <param name="parameters">The data to accompany the post request</param>
         /// <returns>The JSON response</returns>
         protected JsonPayload PostRequest(String url, String parameters) {
-            return genericWebReuest(url, parameters, "POST", false);
+            return genericWebReuest(url, parameters, "POST");
         }
 
         /// <summary>

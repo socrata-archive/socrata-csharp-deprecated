@@ -51,7 +51,9 @@ namespace Socrata {
                     _jsonArray = JArray.Parse(payload);
                 }
                 catch (Exception exor) {
-                    LogManager.GetLogger(typeof(JsonPayload)).Warn("Failed to detect JSON Array or Object.", exor);
+                    if (payload.Length > 0) {
+                        LogManager.GetLogger(typeof(JsonPayload)).Warn("Failed to detect JSON Array or Object.", exor);
+                    }
                     _message = payload;
                 }
             }
