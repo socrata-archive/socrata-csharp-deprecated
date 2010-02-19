@@ -133,8 +133,6 @@ namespace Socrata {
             return multipartAppendOrRefresh(filename, "append");
         }
 
-        // ********************** Work below here
-
         /// <summary>
         /// Add a row to the dataset
         /// </summary>
@@ -167,6 +165,15 @@ namespace Socrata {
             batchQueue.Add(request);
         }
 
+        /// <summary>
+        /// Adds a column to the dataset
+        /// </summary>
+        /// <param name="name">The name of the column</param>
+        /// <param name="description">An optional description</param>
+        /// <param name="type">The column type. See API docs vor valid types</param>
+        /// <param name="width">How many pixels wide to make the column</param>
+        /// <param name="hidden">If true, don't show the column in views, just store the data</param>
+        /// <returns></returns>
         public bool addColumn(String name, String description, String type,
             int width, bool hidden) {
             if (!attached()) {
@@ -245,27 +252,56 @@ namespace Socrata {
                 "?method=setPermission&value=" + paramString));
         }
 
+        /// <summary>
+        /// Gets the metadata associated with the dataset
+        /// </summary>
+        /// <returns></returns>
         public JObject metadata() {
+            if (!attached()) {
+                return null;
+            }
 
-            return null;
+            JsonPayload response = GetRequest("/views/" + _uid + ".json");
+            return response.JsonObject;
         }
 
+        /// <summary>
+        /// Gets a JSON representation of the columns
+        /// </summary>
+        /// <returns></returns>
         public JArray columns() {
-
+            if (!attached()) {
+                return null;
+            }
+            JsonPayload response = GetRequest("/views/" + _uid + "/columns.json");
+            if (responseIsClean(response)) {
+                return response.JsonArray;
+            }
             return null;
         }
 
         public JArray rows() {
-
+            if (!attached()) {
+                return null;
+            }
+            JsonPayload response = GetRequest("/views/" + _uid + "/rows.json");
+            if (responseIsClean(response)) {
+                return response.JsonArray;
+            }
             return null;
         }
 
         public void setAttribution(String attribution, String url) {
-
+            JObject data = new JObject();
+            data.Add("attribution", attribution);
+            data.Add("attributionLink", url);
+            putRequest(data.ToString(Formatting.None, null));
         }
 
         public void setDescription(String description) {
-
+            JObject data = new JObject();
+            data.Add("description", description);
+            putRequest(data.ToString(Formatting.None, null));
         }
 
         /// <summary>
@@ -279,6 +315,10 @@ namespace Socrata {
         private void putRequest(String body) {
             if (!attached()) {
                 return;
+            }
+            JsonPayload response = genericWebReuest("/views/" + _uid, body, "PUT");
+            if (!responseIsClean(response)) {
+                _log.Error("Error in put request. See logs.");
             }
         }
 
