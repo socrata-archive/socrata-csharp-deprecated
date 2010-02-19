@@ -204,6 +204,11 @@ namespace Socrata {
             return addColumn(name, "");
         }
 
+        /// <summary>
+        /// Upload a file to the dataset for use in a cell (e.g. image)
+        /// </summary>
+        /// <param name="filename">Where the file is located on disk</param>
+        /// <returns>A UID to use in celldata, referring to this file</returns>
         public String uploadFile(String filename) {
             if (!attached()) {
                 return null;
@@ -218,8 +223,12 @@ namespace Socrata {
         }
 
         public bool delete() {
+            if (!attached()) {
+                return false;
+            }
 
-            return false;
+            return responseIsClean(genericWebReuest("/views.json/?id=" +
+                _uid + "&method=delete","","DELETE", true));
         }
 
         public bool setPublic(bool isPublic) {
@@ -227,7 +236,7 @@ namespace Socrata {
             return false;
         }
 
-        public JObject metadat() {
+        public JObject metadata() {
 
             return null;
         }

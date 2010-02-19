@@ -84,19 +84,12 @@ namespace Socrata {
             return new JsonPayload(sb.ToString());
         }
 
-        /// <summary>
-        /// Performs a generice POST request on the API server
-        /// </summary>
-        /// <param name="url">Where to send the post request</param>
-        /// <param name="parameters">The data to accompany the post request</param>
-        /// <returns>The JSON response</returns>
-        protected JsonPayload PostRequest(String url, String parameters) {
+        protected JsonPayload genericWebReuest(String url, String parameters, String method, bool ignoreResponse) {
             WebRequest request = WebRequest.Create(httpBase + url);
             request.PreAuthenticate = true;
             request.Credentials = credentials;
 
-            // request.ContentType = "application/x-www-form-urlencoded";
-            request.Method = "POST";
+            request.Method = method;
 
             byte[] bytes = Encoding.ASCII.GetBytes(parameters);
             Stream outputStream = null;
@@ -115,7 +108,6 @@ namespace Socrata {
                     outputStream.Close();
                 }
             }
-
             try {
                 WebResponse response = request.GetResponse();
                 if (response == null) {
@@ -123,12 +115,28 @@ namespace Socrata {
                 }
 
                 StreamReader reader = new StreamReader(response.GetResponseStream());
-                return new JsonPayload(reader.ReadToEnd());
+                String read = reader.ReadToEnd();
+
+                if (ignoreResponse) {
+                    return null;
+                }
+
+                return new JsonPayload(read);
             }
             catch (WebException ex) {
                 _log.Error("Error receiving response from server.", ex);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Performs a generice POST request on the API server
+        /// </summary>
+        /// <param name="url">Where to send the post request</param>
+        /// <param name="parameters">The data to accompany the post request</param>
+        /// <returns>The JSON response</returns>
+        protected JsonPayload PostRequest(String url, String parameters) {
+            return genericWebReuest(url, parameters, "POST", false);
         }
 
         /// <summary>
