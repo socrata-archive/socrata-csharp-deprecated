@@ -141,10 +141,10 @@ namespace Socrata {
         /// <param name="row">A dictionary of column/celldata values</param>
         /// <returns>Success or failure</returns>
         public bool addRow(Dictionary<string,string> row) {
-            JObject rowJson = new JObject();
-            foreach(string k in row.Keys) {
-                rowJson.Add(k, row[k]);
+            if (!attached()) {
+                return false;
             }
+            JObject rowJson = MapToJson(row); 
 
             JsonPayload response = PostRequest("/views/" + _uid + "/rows.json", 
                 rowJson.ToString(Formatting.None, null));
@@ -152,18 +152,69 @@ namespace Socrata {
             return responseIsClean(response);
         }
 
+        /// <summary>
+        /// Like addRow, but doesn't immediately send the data away.
+        /// Instead, it stores it in a queue, which can be flushed with sendBatchRequest
+        /// </summary>
+        /// <param name="row">A dictionary of column/celldata values</param>
         public void delayAddRow(Dictionary<string,string> row) {
+            JObject rowJson = MapToJson(row);
+            string rowString = rowJson.ToString(Formatting.None, null);
 
+            BatchRequest request = new BatchRequest("POST", httpBase +
+                "/views/" + _uid + "/rows.json",
+                rowString);
+            batchQueue.Add(request);
         }
 
-        public bool addColumn(String name, String description, String type, int width, bool hidden) {
+        public bool addColumn(String name, String description, String type,
+            int width, bool hidden) {
+            if (!attached()) {
+                return false;
+            }
 
-            return false;
+            _log.Debug("Creating column '" + name + "' of type '" +
+                   type + "'");
+
+            JObject column = new JObject();
+            column.Add("name", name);
+            column.Add("description", description);
+            column.Add("dataTypeName", type);
+            column.Add("hidden", hidden);
+            column.Add("width", width);
+
+            JsonPayload response = PostRequest("/views/" + _uid + "/columns.json",
+                column.ToString(Formatting.None, null));
+            return responseIsClean(response);
         }
 
-        public String uploadFile(String file) {
+        public bool addColumn(String name, String description, String type, int width) {
+            return addColumn(name, description, type, width, false);
+        }
 
-            return null;
+        public bool addColumn(String name, String description, String type) {
+            return addColumn(name, description, type, DEFAULT_COLUMN_WIDTH);
+        }
+
+        public bool addColumn(String name, String description) {
+            return addColumn(name, description, DEFAULT_COLUMN_TYPE);
+        }
+
+        public bool addColumn(String name) {
+            return addColumn(name, "");
+        }
+
+        public String uploadFile(String filename) {
+            if (!attached()) {
+                return null;
+            }
+            JObject response = multipartUpload("/views/" + _uid + "/files.txt", filename);
+
+            if (response == null) {
+                _log.Error("Received a null response after file upload.");
+                return null;
+            }
+            return (string)response["file"];
         }
 
         public bool delete() {

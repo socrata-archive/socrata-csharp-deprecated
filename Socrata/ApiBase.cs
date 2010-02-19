@@ -32,9 +32,10 @@ namespace Socrata {
     /// Base class under which all Socrata classes inherit.
     /// </summary>
     public class ApiBase {
-        protected static ILog _log;
-        protected NetworkCredential credentials;
-        protected string httpBase;
+        protected static ILog           _log;
+        protected NetworkCredential     credentials;
+        protected string                httpBase;
+        protected List<BatchRequest>    batchQueue;
 
         public ApiBase() {
             _log = LogManager.GetLogger(typeof(ApiBase));
@@ -171,6 +172,14 @@ namespace Socrata {
                     return false;
             }
             return true;
+        }
+
+        protected static JObject MapToJson(Dictionary<string, string> data) {
+            JObject json = new JObject();
+            foreach (string k in data.Keys) {
+                json.Add(k, data[k]);
+            }
+            return json;
         }
     }
 }
