@@ -19,12 +19,42 @@ limitations under the License.
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace Socrata {
     /// <summary>
     /// Represents a Socrata user
     /// </summary>
     public class User : ApiBase {
+        private string _username;
+
+        public User(String username) : base() {
+            this._username = username;
+        }
+
+        /// <summary>
+        /// Gets all the publicly accessible datasets belonging to this user
+        /// </summary>
+        /// <returns>A list of datasets</returns>
+        public List<Dataset> datasets() {
+            JsonPayload response = GetRequest("/users/" + _username + "/views.json");
+            if (!responseIsClean(response)) {
+                _log.Error("Could not get datasets belonging to '" + _username + "'");
+                return null;
+            }
+            JArray sets = response.JsonArray;
+            List<Dataset> results = new List<Dataset>();
+
+            for (int i = 0; i < sets.Count; i++) {
+                Dataset set = new Dataset();
+                JObject setObject = (JObject) sets[i];
+                string setUID = (string) setObject["id"];
+                set.attach(setUID);
+                results.Add(set);
+            }
+            return results;
+        }
+
 
     }
 
