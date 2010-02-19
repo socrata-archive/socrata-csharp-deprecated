@@ -135,10 +135,21 @@ namespace Socrata {
 
         // ********************** Work below here
 
-
+        /// <summary>
+        /// Add a row to the dataset
+        /// </summary>
+        /// <param name="row">A dictionary of column/celldata values</param>
+        /// <returns>Success or failure</returns>
         public bool addRow(Dictionary<string,string> row) {
+            JObject rowJson = new JObject();
+            foreach(string k in row.Keys) {
+                rowJson.Add(k, row[k]);
+            }
 
-            return false;
+            JsonPayload response = PostRequest("/views/" + _uid + "/rows.json", 
+                rowJson.ToString(Formatting.None, null));
+
+            return responseIsClean(response);
         }
 
         public void delayAddRow(Dictionary<string,string> row) {
