@@ -131,6 +131,28 @@ namespace Socrata {
         }
 
         /// <summary>
+        /// For uploading a file and returning JSON response.
+        /// </summary>
+        /// <param name="url">Where to upload the file</param>
+        /// <param name="file">The file location on disk</param>
+        /// <returns></returns>
+        protected JsonPayload UploadFile(String url, String file) {
+            WebClient webClient = new WebClient();
+            webClient.Credentials = credentials;
+
+            byte[] responseArray;
+            try {
+                responseArray = webClient.UploadFile(httpBase + url, file);
+                String responseString = System.Text.Encoding.ASCII.GetString(responseArray);
+                return new JsonPayload(responseString);
+            }
+            catch (WebException ex) {
+                _log.Error("Error uploading file.", ex);
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Checks response object to see if any errors are present
         /// </summary>
         /// <param name="response">The JSON response returned from the server</param>
@@ -145,7 +167,7 @@ namespace Socrata {
                 return false;
             }
             else if (response.JsonObject != null && response.JsonObject["error"] != null) {
-                    _log.Error("Error in response: " + response.JsonObject["error"]);
+                    _log.Error("Error in response: " + (string)response.JsonObject["error"]);
                     return false;
             }
             return true;
