@@ -1,0 +1,14 @@
+Socrata - C# Readme
+Updated 23-Feb-2010, Aiden Scandella
+
+
+In order to use the library in a C# project, a few configuration options are necessary.
+These options should be specified in your project's "app.config" file, and are as follows:
+
+	socrata.host: The hostname of the Socrata API server to communicate with. For default projects on Socrata's public host, this should be set to www.socrata.com. If you have your own Socrata host, specify it here.
+
+	socrata.username: The user credentials to use.
+	socrata.password: The password for the user account specified.
+
+Once those are specified, you may interact with datasets and users by instantiating a Socrata::Dataset or Socrata::User respectively. If you with to work on an existing dataset, you may do so once the Dataset object is created by using attach('abcd-abcd') where the parameter passed to attach is the four-four UID for the dataset.
+
