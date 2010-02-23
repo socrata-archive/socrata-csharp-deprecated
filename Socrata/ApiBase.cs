@@ -174,7 +174,6 @@ namespace Socrata {
 
             JObject bodyObject = new JObject();
             bodyObject.Add("requests", batches);
-            Console.WriteLine(bodyObject.ToString(Formatting.None, null));
 
             JsonPayload response = genericWebReuest("/batches", bodyObject.ToString(Formatting.None, null), "POST");
             if (responseIsClean(response)) {
