@@ -237,7 +237,7 @@ namespace Socrata {
             if (!attached()) {
                 return false;
             }
-            return responseIsClean(genericWebReuest("/views.json/?id=" +
+            return responseIsClean(genericWebRequest("/views.json/?id=" +
                 _uid + "&method=delete","","DELETE"));
         }
 
@@ -329,7 +329,7 @@ namespace Socrata {
             if (!attached()) {
                 return;
             }
-            JsonPayload response = genericWebReuest("/views/" + _uid, body, "PUT");
+            JsonPayload response = genericWebRequest("/views/" + _uid, body, "PUT");
             if (!responseIsClean(response)) {
                 _log.Error("Error in put request. See logs.");
             }

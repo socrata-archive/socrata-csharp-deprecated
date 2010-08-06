@@ -85,15 +85,17 @@ namespace Socrata {
 
             return new JsonPayload(sb.ToString());
         }
+        protected JsonPayload genericWebRequest(String url, String parameters,
+            String method) {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(httpBase + url);
 
-        protected JsonPayload genericWebReuest(String url, String parameters, String method) {
-            WebRequest request = WebRequest.Create(httpBase + url);
-            request.PreAuthenticate = true;
-            request.Credentials = credentials;
+            string creds = String.Format("{0}:{1}", credentials.UserName, credentials.Password);
+            byte[] bytes = Encoding.ASCII.GetBytes(creds);
+            string base64 = Convert.ToBase64String(bytes);
+            request.Headers.Add("Authorization", "Basic " + base64);
 
             request.Method = method;
-
-            byte[] bytes = Encoding.ASCII.GetBytes(parameters);
+            bytes = Encoding.ASCII.GetBytes(parameters);
             Stream outputStream = null;
 
             try {
@@ -134,7 +136,7 @@ namespace Socrata {
         /// <param name="parameters">The data to accompany the post request</param>
         /// <returns>The JSON response</returns>
         protected JsonPayload PostRequest(String url, String parameters) {
-            return genericWebReuest(url, parameters, "POST");
+            return genericWebRequest(url, parameters, "POST");
         }
 
         /// <summary>
@@ -175,7 +177,7 @@ namespace Socrata {
             JObject bodyObject = new JObject();
             bodyObject.Add("requests", batches);
 
-            JsonPayload response = genericWebReuest("/batches", bodyObject.ToString(Formatting.None, null), "POST");
+            JsonPayload response = genericWebRequest("/batches", bodyObject.ToString(Formatting.None, null), "POST");
             if (responseIsClean(response)) {
                 _log.Debug("Sent batch requests: " + batchQueue.Count + " total.");
                 batchQueue.Clear();
@@ -184,6 +186,7 @@ namespace Socrata {
                 _log.Error("Error sending batch request.");
             }
         }
+
 
         /// <summary>
         /// Checks response object to see if any errors are present
