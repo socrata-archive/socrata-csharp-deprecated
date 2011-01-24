@@ -1,6 +1,6 @@
 ﻿/*
 
-Copyright (c) 2010 Socrata.
+Copyright (c) 2011 Socrata.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ namespace Socrata {
         protected static ILog           _log;
         protected NetworkCredential     credentials;
         protected string                httpBase;
+        protected string                appToken;
         protected List<BatchRequest>    batchQueue;
 
         public ApiBase() {
@@ -43,9 +44,10 @@ namespace Socrata {
             // Sets up log4net to use a root level logger with ConsoleAppend
             BasicConfigurator.Configure();
 
-            credentials = new NetworkCredential(ConfigurationSettings.AppSettings["socrata.username"],
-                ConfigurationSettings.AppSettings["socrata.password"]);
-            httpBase = ConfigurationSettings.AppSettings["socrata.host"];
+            credentials = new NetworkCredential(ConfigurationManager.AppSettings["socrata.username"],
+                ConfigurationManager.AppSettings["socrata.password"]);
+            httpBase = ConfigurationManager.AppSettings["socrata.host"];
+            appToken = ConfigurationManager.AppSettings["socrata.app_token"];
         }
 
         /// <summary>
@@ -54,9 +56,11 @@ namespace Socrata {
         /// <param name="url">The URL to request from</param>
         /// <returns>The JSON response</returns>
         protected JsonPayload GetRequest(String url) {
-            HttpWebRequest request = (HttpWebRequest) WebRequest.Create(httpBase + url);
+            HttpWebRequest request  = (HttpWebRequest) WebRequest.Create(httpBase + url);
             request.PreAuthenticate = true;
-            request.Credentials = credentials;
+            request.Credentials     = credentials;
+
+            request.Headers.Add("X-App-Token", appToken);
             HttpWebResponse response;
             try {
                 response = (HttpWebResponse)request.GetResponse();
@@ -67,10 +71,10 @@ namespace Socrata {
             }
 
             Stream responseStream = response.GetResponseStream();
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb      = new StringBuilder();
 
-            string temp = null;
-            int count = 0;
+            string temp   = null;
+            int count     = 0;
             byte[] buffer = new byte[8192];
 
             // Read to the end of the response
@@ -85,17 +89,22 @@ namespace Socrata {
 
             return new JsonPayload(sb.ToString());
         }
+
         protected JsonPayload genericWebRequest(String url, String parameters,
             String method) {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(httpBase + url);
+            HttpWebRequest request  = (HttpWebRequest)WebRequest.Create(httpBase + url);
+            request.PreAuthenticate = true;
+            request.Credentials     = credentials;
+            request.Method          = method;
+            request.Headers.Add("X-App-Token", appToken);
 
             string creds = String.Format("{0}:{1}", credentials.UserName, credentials.Password);
             byte[] bytes = Encoding.ASCII.GetBytes(creds);
             string base64 = Convert.ToBase64String(bytes);
             request.Headers.Add("Authorization", "Basic " + base64);
 
-            request.Method = method;
             bytes = Encoding.ASCII.GetBytes(parameters);
+
             Stream outputStream = null;
 
             try {
@@ -146,7 +155,7 @@ namespace Socrata {
         /// <param name="file">The file location on disk</param>
         /// <returns></returns>
         protected JsonPayload UploadFile(String url, String file) {
-            WebClient webClient = new WebClient();
+            WebClient webClient   = new WebClient();
             webClient.Credentials = credentials;
 
             byte[] responseArray;
@@ -186,7 +195,6 @@ namespace Socrata {
                 _log.Error("Error sending batch request.");
             }
         }
-
 
         /// <summary>
         /// Checks response object to see if any errors are present
