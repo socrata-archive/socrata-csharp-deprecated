@@ -188,6 +188,13 @@ namespace Socrata {
 
             JsonPayload response = genericWebRequest("/batches", bodyObject.ToString(Formatting.None, null), "POST");
             if (responseIsClean(response)) {
+                if (response.JsonArray.Count != batchQueue.Count)
+                {
+                    int lastRow = response.JsonArray.Count-1;
+                    _log.Error("Error in request", new Exception(response.JsonArray[lastRow].ToString()));
+                    batchQueue.RemoveRange(0, lastRow+1);
+                    sendBatchRequest();
+                }
                 _log.Debug("Sent batch requests: " + batchQueue.Count + " total.");
                 batchQueue.Clear();
             }
