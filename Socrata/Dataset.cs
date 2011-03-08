@@ -247,9 +247,12 @@ namespace Socrata {
         /// <param name="isPublic">Whether or not it should be publicly viewable</param>
         /// <returns></returns>
         public bool setPublic(bool isPublic) {
+            if (!attached()) {
+                return false;
+            }
             string paramString = isPublic ? "public.read" : "private";
-            return responseIsClean(GetRequest("/views/" + _uid + 
-                "?method=setPermission&value=" + paramString));
+            return responseIsClean(genericWebRequest("/views/" + _uid +
+                "?method=setPermission&value=" + paramString, "", "PUT"));
         }
 
         /// <summary>
