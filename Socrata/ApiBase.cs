@@ -90,6 +90,13 @@ namespace Socrata {
             return new JsonPayload(sb.ToString());
         }
 
+        protected string getAuthorization() {
+            string creds = String.Format("{0}:{1}", credentials.UserName, credentials.Password);
+            byte[] bytes = Encoding.ASCII.GetBytes(creds);
+            string base64 = Convert.ToBase64String(bytes);
+            return "Basic " + base64;
+        }
+
         protected JsonPayload genericWebRequest(String url, String parameters,
             String method) {
             HttpWebRequest request  = (HttpWebRequest)WebRequest.Create(httpBase + url);
@@ -97,11 +104,7 @@ namespace Socrata {
             request.Credentials     = credentials;
             request.Method          = method;
             request.Headers.Add("X-App-Token", appToken);
-
-            string creds = String.Format("{0}:{1}", credentials.UserName, credentials.Password);
-            byte[] bytes = Encoding.ASCII.GetBytes(creds);
-            string base64 = Convert.ToBase64String(bytes);
-            request.Headers.Add("Authorization", "Basic " + base64);
+            request.Headers.Add("Authorization", getAuthorization());
 
             bytes = Encoding.ASCII.GetBytes(parameters);
 
@@ -157,6 +160,8 @@ namespace Socrata {
         protected JsonPayload UploadFile(String url, String file) {
             WebClient webClient   = new WebClient();
             webClient.Credentials = credentials;
+            webClient.Headers.Add("X-App-Token", appToken);
+            webClient.Headers.Add("Authorization", getAuthorization());
 
             byte[] responseArray;
             try {
