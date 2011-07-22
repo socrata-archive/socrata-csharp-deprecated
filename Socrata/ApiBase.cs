@@ -59,8 +59,9 @@ namespace Socrata {
             HttpWebRequest request  = (HttpWebRequest) WebRequest.Create(httpBase + url);
             request.PreAuthenticate = true;
             request.Credentials     = credentials;
-
             request.Headers.Add("X-App-Token", appToken);
+            request.Headers.Add("Authorization", getAuthorization());
+
             HttpWebResponse response;
             try {
                 response = (HttpWebResponse)request.GetResponse();
