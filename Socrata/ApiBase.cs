@@ -107,7 +107,7 @@ namespace Socrata {
             request.Headers.Add("X-App-Token", appToken);
             request.Headers.Add("Authorization", getAuthorization());
 
-            bytes = Encoding.ASCII.GetBytes(parameters);
+            byte[] bytes = Encoding.ASCII.GetBytes(parameters);
 
             Stream outputStream = null;
 
