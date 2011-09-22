@@ -120,8 +120,22 @@ namespace Socrata {
         /// </summary>
         /// <param name="filename">The location of the file to overwrite the dataset with</param>
         /// <returns>Whether it worked</returns>
-        public bool refresh(String filename) {
-            return multipartAppendOrRefresh(filename, "replace");
+        public bool refresh(String filename)
+        {
+            return this.refresh(filename, false);
+        }
+
+        /// <summary>
+        /// Replaces the data in the existing attached dataset with the contents of the file
+        /// </summary>
+        /// <param name="filename">The location of the file to overwrite the dataset with</param>
+        /// <param name="skipHeaders">Whether to skip the first row of your import file</param>
+        /// <returns>Whether it worked</returns>
+        public bool refresh(String filename, bool skipHeaders) {
+            var endpointName = new StringBuilder("replace");
+            if (skipHeaders)
+                endpointName.Append("?skip_headers=true");
+            return multipartAppendOrRefresh(filename, endpointName.ToString());
         }
 
         /// <summary>
@@ -130,7 +144,21 @@ namespace Socrata {
         /// <param name="filename">The location of the file on disk</param>
         /// <returns>Whether it worked</returns>
         public bool append(String filename) {
-            return multipartAppendOrRefresh(filename, "append");
+            return this.append(filename, false);
+        }
+
+        /// <summary>
+        /// Replaces the data in the existing attached dataset with the contents of the file
+        /// </summary>
+        /// <param name="filename">The location of the file to add to the dataset</param>
+        /// <param name="skipHeaders">Whether to skip the first row of your import file</param>
+        /// <returns>Whether it worked</returns>
+        public bool append(String filename, bool skipHeaders)
+        {
+            var endpointName = new StringBuilder("append");
+            if (skipHeaders)
+                endpointName.Append("?skip_headers=true");
+            return multipartAppendOrRefresh(filename, endpointName.ToString());
         }
 
         /// <summary>
