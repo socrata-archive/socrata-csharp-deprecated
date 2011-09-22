@@ -151,6 +151,62 @@ namespace Socrata {
         }
 
         /// <summary>
+        /// Make a working copy of a published dataset, with all row data copied.
+        /// </summary>
+        /// <returns>Uid of the new working copy view.</returns>
+        public String copy()
+        {
+            return this.copyWithMethod("copy");
+        }
+
+        /// <summary>
+        /// Make a working copy of only the schema of a published dataset, with
+        /// all row data omitted.
+        /// </summary>
+        /// <returns>Uid of the new working copy view.</returns>
+        public String copySchema()
+        {
+            return this.copyWithMethod("copySchema");
+        }
+
+        private String copyWithMethod(String method)
+        {
+            JsonPayload response = this.PostRequest(String.Format("/views/{0}/publication?method={1}", this._uid, method), "");
+
+            bool stillWorking = true;
+            do
+            {
+                String result = (String)response.JsonObject["status"];
+                if (result != "processing")
+                {
+                    stillWorking = false;
+                }
+                else
+                {
+                    response = this.PostRequest(String.Format("/views/{0}/publication?method={1}", this._uid, method), "");
+                }
+            } while (stillWorking);
+
+            if (!this.responseIsClean(response))
+                return null;
+
+            return (String)response.JsonObject["id"];
+        }
+
+        /// <summary>
+        /// Performs a publish operation on a working copy dataset, to
+        /// commit the changes you've made to the working copy to the
+        /// published copy. Note that this should be called on the working
+        /// copy, not the published version.
+        /// </summary>
+        /// <returns>Success or failure</returns>
+        public bool publish()
+        {
+            JsonPayload response = this.PostRequest(String.Format("/views/{0}/publication", this._uid), "");
+            return responseIsClean(response);
+        }
+
+        /// <summary>
         /// Like addRow, but doesn't immediately send the data away.
         /// Instead, it stores it in a queue, which can be flushed with sendBatchRequest
         /// </summary>
