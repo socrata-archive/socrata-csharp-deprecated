@@ -134,7 +134,7 @@ namespace Socrata {
         public bool refresh(String filename, bool skipHeaders) {
             var endpointName = new StringBuilder("replace");
             if (skipHeaders)
-                endpointName.Append("?skip_headers=true");
+                endpointName.Append("&skip_headers=true");
             return multipartAppendOrRefresh(filename, endpointName.ToString());
         }
 
@@ -157,7 +157,7 @@ namespace Socrata {
         {
             var endpointName = new StringBuilder("append");
             if (skipHeaders)
-                endpointName.Append("?skip_headers=true");
+                endpointName.Append("&skip_headers=true");
             return multipartAppendOrRefresh(filename, endpointName.ToString());
         }
 
